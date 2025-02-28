@@ -1,3 +1,7 @@
+# some specific files that are just too big
+classification.csv
+WFO_Backbone.zip
+
 # History files
 .Rhistory
 .Rapp.history

@@ -11,6 +11,7 @@ if(!exists('dat.tr')) {
   temp <- tempfile()
   download.file(smithBrownTree,temp)
   dat.tr <- read.tree(unz(temp, "v0.1/ALLMB.tre"))
+  write.tree(dat.tr, 'prairiePhylo_2.2/DATA/ALLMB.tre') # added 2025-02-28 as fail-safe
   unlink(temp)
 } # close if
 
@@ -22,13 +23,27 @@ dat.tr2 <-
   drop.tip(dat.tr2, setdiff(dat.tr2$tip.label, dat.names$splicedTreeName))
 dat.tr2 <- force.ultrametric(dat.tr2)
 
-nodes <- c(
-  Symphyotrichum_oolentangiense = 'Symphyotrichum_novae-angliae|Symphyotrichum_laeve'
-) # close nodes
+## added 2025-02-28 to get singletons back in more generally
+## assumes the genus is present and represented by > 1 sp
+## welds tip to base of genus
+tipsToAdd <- setdiff(dat.names$splicedTreeName, dat.tr2$tip.label)
+
+if(length(tipsToAdd) > 0) {
+  nodes <- sapply(tipsToAdd, function(x) {
+    label.elements(x, delim = '_') |>
+    grep(x = dat.tr2$tip.label, value = T)
+  }, simplify = FALSE # close function(x)
+  ) # close sapply
+} # close if(length...)
+
+## previous version:
+# nodes <- c(
+#   Symphyotrichum_oolentangiense = 'Symphyotrichum_novae-angliae|Symphyotrichum_laeve'
+# ) # close nodes
 
 for(i in names(nodes)) {
   message(paste('... binding', i, 'to phylogeny'))
-  nodeTemp <- findMRCA(dat.tr2, grep(nodes[i], dat.tr$tip.label, value = T))
+  nodeTemp <- findMRCA(dat.tr2, nodes[[i]])
   dat.tr2 <- bind.tip(dat.tr2, i, where = nodeTemp)
   rm(nodeTemp)
 } # close for
@@ -71,3 +86,11 @@ dat.tr.figures$tip.label <-
 
 write.tree(dat.tr.analysis, 'prairiePhylo_2.2/OUT/tr.analysis.tre')
 write.tree(dat.tr.figures, 'prairiePhylo_2.2/OUT/tr.acceptedNames.tre')
+
+pdf('prairiePhylo_2.2/OUT/dat.tr.figure.pdf')
+plot(dat.tr.figures, cex = 0.3)
+dev.off()
+
+pdf('prairiePhylo_2.2/OUT/dat.tr.analysis.pdf')
+plot(dat.tr.analysis, cex = 0.3)
+dev.off()

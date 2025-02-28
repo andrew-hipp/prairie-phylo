@@ -8,7 +8,7 @@ if(!exists('WFO.data')) {
   rm(tempWFO)
 }
 
-dat.names <- read.csv('prairiePhylo_2.2/DATA/dat.names.barber25.csv')
+dat.names <- dat.names.orig <- read.csv('prairiePhylo_2.2/DATA/dat.names.barber25.csv')
 dat.wfoMatch <-
   WFO.match(gsub('_', ' ', dat.names$treeName, fixed = T),
             WFO.data = WFO.data,

@@ -16,12 +16,12 @@ if(!exists('dat.tr')) {
 } # close if
 
 
-## weld on singletons;
-## at this point, only Symphyotrichum oolentangiense
 dat.tr2 <- dat.tr
 dat.tr2 <-
   drop.tip(dat.tr2, setdiff(dat.tr2$tip.label, dat.names$splicedTreeName))
 dat.tr2 <- force.ultrametric(dat.tr2)
+
+## weld on singletons
 
 ## added 2025-02-28 to get singletons back in more generally
 ## assumes the genus is present and represented by > 1 sp
@@ -36,11 +36,12 @@ if(length(tipsToAdd) > 0) {
   ) # close sapply
 } # close if(length...)
 
-## previous version:
+## previous version, hard-coded for Symphyotrichum oolentangiense
 # nodes <- c(
 #   Symphyotrichum_oolentangiense = 'Symphyotrichum_novae-angliae|Symphyotrichum_laeve'
 # ) # close nodes
 
+## previously used grep to find nodes, now just uses vector of tips per genus
 for(i in names(nodes)) {
   message(paste('... binding', i, 'to phylogeny'))
   nodeTemp <- findMRCA(dat.tr2, nodes[[i]])
